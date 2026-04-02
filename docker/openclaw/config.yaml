@@ -1,0 +1,70 @@
+# OpenClaw 完整配置
+
+# ============ API 配置 (必填) ============
+api:
+  key: ""
+  url: ""
+
+# ============ 模型配置 ============
+model:
+  id: "gpt-51-1113-global"
+  name: "gpt-51-1113-global"
+  provider_name: "Idealab"  # 这个名字会显示在配置中
+  context_window: 400000
+  max_tokens: 128000
+  reasoning: false
+  auth_header: true
+
+# ============ Agent 配置 ============
+agent:
+  workspace: "/root/.openclaw/workspace"  # 容器内路径
+  max_concurrent: 4
+  subagents_max_concurrent: 8
+  compaction_mode: "safeguard"
+
+# ============ Gateway 配置 ============
+gateway:
+  port: 18789
+  mode: "local"
+  bind: "lan"  # Docker 必须用 lan，不能用 loopback
+  auth_token: ""
+
+# ============ 功能开关 ============
+features:
+  browser_enabled: true
+  browser_evaluate_enabled: true
+  browser_attach_only: true
+  cron_enabled: true
+  web_enabled: true
+  canvas_host_enabled: true
+
+# ============ 其他配置 ============
+messages:
+  ack_reaction_scope: "group-mentions"
+
+commands:
+  native: "auto"
+  native_skills: "auto"
+
+skills:
+  node_manager: "npm"
+
+tailscale:
+  mode: "off"
+  reset_on_exit: false
+
+max_concurrent: 10
+
+# ============ 批量任务重试配置 ============
+retry:
+  # Prompt 请求重试配置
+  prompt:
+    max_attempts: 3      # 最多重试次数
+    min_wait: 4          # 最小等待时间（秒）
+    max_wait: 10         # 最大等待时间（秒）
+
+  # 健康检查重试配置
+  health_check:
+    max_attempts: 30     # 最多重试次数
+    min_wait: 2          # 最小等待时间（秒）
+    max_wait: 5          # 最大等待时间（秒）

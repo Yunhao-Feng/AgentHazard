@@ -1,0 +1,60 @@
+# OpenClaw Docker Image
+FROM ubuntu:22.04
+
+# Avoid interactive prompts during build
+ENV DEBIAN_FRONTEND=noninteractive
+ENV HOME=/root
+ENV NODE_ENV=production
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    ca-certificates \
+    gnupg \
+    python3 \
+    python3-pip \
+    jq \
+    procps \
+    mailutils \
+    msmtp \
+    msmtp-mta
+
+# Install Node.js 22 (required by OpenClaw)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs
+
+# Verify Node version
+RUN node --version && npm --version
+
+# Install OpenClaw globally
+RUN npm install -g openclaw@latest
+
+# Install Python dependencies for API server
+RUN pip3 install fastapi uvicorn pyyaml aiofiles
+
+# Create workspace directories
+RUN mkdir -p /root/.openclaw/workspace \
+    && mkdir -p /root/.openclaw/agents/main/sessions \
+    && mkdir -p /app/configs
+
+# Copy helper scripts
+COPY config-mapper.py /app/config-mapper.py
+COPY api-server.py /app/api-server.py
+COPY entrypoint.sh /app/entrypoint.sh
+
+
+RUN chmod +x /app/entrypoint.sh
+
+# Expose ports
+# 18789 - OpenClaw gateway
+# 8000 - API server
+EXPOSE 18789 8000
+
+WORKDIR /app
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost:8000/health || exit 1
+
+ENTRYPOINT ["/app/entrypoint.sh"]

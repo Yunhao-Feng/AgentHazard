@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  openclaw:
+    build:
+      context: .
+      dockerfile: Dockerfile.openclaw
+    container_name: openclaw-service
+    ports:
+      - "18789:18789"  # OpenClaw gateway
+      - "8000:8000"    # API server
+    volumes:
+      # Mount external config
+      - ./config.yaml:/app/configs/config.yaml:ro
+
+      # Mount sessions directory for persistence (optional)
+      # Uncomment to persist sessions across container restarts
+      # - ./sessions:/root/.openclaw/agents/main/sessions
+
+      # Mount workspace for agent operations (optional)
+      # - ./workspace:/root/.openclaw/workspace
+
+    environment:
+      - OPENCLAW_GATEWAY_TOKEN=your-secure-token-here
+      - NODE_ENV=production
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+    # Resource limits (adjust based on your needs)
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+
+# Optional: Network configuration for multiple containers
+networks:
+  default:
+    name: openclaw-network
