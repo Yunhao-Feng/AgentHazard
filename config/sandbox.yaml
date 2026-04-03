@@ -1,0 +1,9 @@
+agent: ""  # 'iflow'/'claude'/'openhands'
+rock_hack_file: "config/rock_hack.yml"
+model_name: ""
+data_file: ""
+max_concurrent: 30  # Maximum concurrent number
+max_retries: 10
+decision_model: "gemini-3-flash-preview"
+apiKey: ""
+baseUrl: ""
