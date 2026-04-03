@@ -53,7 +53,7 @@ All materials required for review are available below:
 | 📊 **Dataset** | 2,653 instances in JSON format | [Download](data/dataset.json) |
 | 📄 **Appendix** | Detailed taxonomy and methodology | [Download](appendix.pdf) |
 | 💻 **Code** | Full source code & evaluation framework | [GitHub](https://github.com/Yunhao-Feng/AgentHazard) |
-| 🔍 **Trajectories** | Execution traces from agent runs | [Browse](traces/) |
+| 🔍 **Trajectories** | Execution traces from agent runs | [Browse](https://github.com/Yunhao-Feng/AgentHazard/tree/main/traces) |
 
 ### Quick Start
 
