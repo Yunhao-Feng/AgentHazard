@@ -210,7 +210,7 @@ AgentHazard/
 │   ├── framework.png
 │   ├── illustration.png
 │   ├── demo.jpg
-│   ├── dataset_heatmap.png
+│   ├── heatmap.jpg
 │   └── alert.png                # Real security alert evidence
 ├── appendix.pdf                 # Supplementary material
 ├── index.html                   # Project website
