@@ -634,17 +634,19 @@
             <h2 class="section-title">Abstract</h2>
             <div class="abstract">
                 <p>
+
                     Computer-use agents extend language models from text generation to persistent action over tools, files, and execution environments.
-                    This creates a distinct safety challenge in that harmful behavior may emerge through sequences of individually plausible steps.
-                    We present <span class="highlight">AgentHazard</span>, a benchmark containing <span class="highlight">2,653 instances</span>
-                    spanning diverse risk categories and attack strategies.
-                </p>
-                <br>
-                <p>
+                    Unlike chat systems, they maintain state across interactions and translate intermediate outputs into concrete actions.
+                    This creates a distinct safety challenge in that harmful behavior may emerge through sequences of individually plausible steps,
+                    including intermediate actions that appear locally acceptable but collectively lead to unauthorized actions.
+                    We present <span class="highlight">AgentHazard</span>, a benchmark for evaluating harmful behavior in computer-use agents.
+                    AgentHazard contains <span class="highlight">2,653 instances</span> spanning diverse risk categories and attack strategies.
                     Each instance pairs a harmful objective with a sequence of operational steps that are locally legitimate but jointly induce unsafe behavior.
-                    Our evaluation on <span class="highlight">Claude Code, OpenClaw, and IFlow</span> using models from the
-                    <span class="highlight">Qwen, Kimi, GLM, and DeepSeek families</span> shows that current systems remain highly vulnerable,
-                    with attack success rates reaching <span class="highlight">82.90%</span>.
+                    The benchmark evaluates whether agents can recognize and interrupt harm arising from accumulated context, repeated tool use, intermediate actions, and dependencies across steps.
+                    We evaluate AgentHazard on <span class="highlight">Claude Code, OpenClaw, and IFlow</span> using mostly open or openly deployable models from the <span class="highlight">Qwen, Kimi, GLM, and DeepSeek families</span>.
+                    Our experimental results indicate that current systems remain highly vulnerable.
+                    In particular, when powered by Qwen3-Coder, Claude Code exhibits an attack success rate of <span class="highlight">73.63%</span>, suggesting that model alignment alone does not reliably guarantee the safety of autonomous agents.
+                    
                 </p>
             </div>
         </section>
