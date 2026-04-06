@@ -6,7 +6,7 @@
 
 **A Benchmark for Evaluating Harmful Behavior in Computer-Use Agents**
 
-[![ACMMM 2026](https://img.shields.io/badge/ACMMM-2026-blue.svg)](https://2026.acmmm.org/)
+<!-- [![ACMMM 2026](https://img.shields.io/badge/ACMMM-2026-blue.svg)](https://2026.acmmm.org/) -->
 [![Dataset](https://img.shields.io/badge/Dataset-2653_instances-green.svg)](data/dataset.json)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Website](https://img.shields.io/badge/Website-Live-orange.svg)](https://yunhao-feng.github.io/AgentHazard/)
@@ -291,9 +291,8 @@ If you use AgentHazard in your research, please cite:
   title     = {AgentHazard: A Benchmark for Evaluating Harmful Behavior in Computer-Use Agents},
   author    = {Feng, Yunhao and Ding, Yifan and Tan, Yingshui and Ma, Xingjun and
                Li, Yige and Wu, Yutao and Gao, Yifeng and Zhai, Kun and Guo, Yanming},
-  booktitle = {Proceedings of the 34th ACM International Conference on Multimedia},
-  year      = {2026},
-  organization = {ACM}
+  booktitle = {arXiv:2604.02947},
+  year      = {2026}
 }
 ```
 
