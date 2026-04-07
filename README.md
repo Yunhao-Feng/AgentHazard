@@ -277,7 +277,7 @@ for traj in trajectories:
 
 ### Corresponding Author (†)
 
-- **Xingjun Ma** - Fudan University ([xingjunma@fudan.edu.cn](mailto:xingjunma@fudan.edu.cn))
+- **Xingjun Ma** - Fudan University
 
 ---
 
@@ -321,7 +321,6 @@ We welcome contributions! Please see our [contributing guidelines](CONTRIBUTING.
 
 For questions, issues, or collaboration inquiries:
 
-- **Email**: [xingjunma@fudan.edu.cn](mailto:xingjunma@fudan.edu.cn)
 - **GitHub Issues**: [Report a bug or request a feature](https://github.com/Yunhao-Feng/AgentHazard/issues)
 - **Website**: [https://yunhao-feng.github.io/AgentHazard/](https://yunhao-feng.github.io/AgentHazard/)
 
