@@ -10,7 +10,7 @@
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Website](https://img.shields.io/badge/Website-Live-orange.svg)](https://yunhao-feng.github.io/AgentHazard/)
 
-[🌐 Website](https://yunhao-feng.github.io/AgentHazard/) | [📊 Dataset](data/dataset.json) | [📄 Paper](https://arxiv.org/abs/xxxx.xxxxx) | [📖 Appendix](appendix.pdf)
+[🌐 Website](https://yunhao-feng.github.io/AgentHazard/) | [📊 Dataset](data/dataset.json) | [📄 Paper](https://arxiv.org/abs/2604.02947) | [📖 Appendix](appendix.pdf) | [🤗 Hugging Face](https://huggingface.co/datasets/Yunhao-Feng/AgentHazard) 
 
 </div>
 
