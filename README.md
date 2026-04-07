@@ -217,67 +217,7 @@ AgentHazard/
 └── LICENSE                      # MIT License
 ```
 
----
 
-## 🚀 Usage
-
-### Evaluation Framework
-
-```python
-from agenthazard import AgentHazardBench, evaluate_agent
-
-# Load the benchmark
-bench = AgentHazardBench.from_json('data/dataset.json')
-
-# Evaluate your agent
-results = evaluate_agent(
-    agent=your_agent,
-    benchmark=bench,
-    framework='claudecode',
-    output_dir='results/'
-)
-
-# Analyze results
-print(f"Attack Success Rate: {results.asr:.2%}")
-print(f"Avg Harmfulness Score: {results.harm_score:.2f}")
-```
-
-### Trajectory Analysis
-
-```python
-from agenthazard import load_trajectories
-
-# Load execution trajectories
-trajectories = load_trajectories('traces/claudecode/')
-
-# Analyze multi-step behavior
-for traj in trajectories:
-    print(f"Instance: {traj.instance_id}")
-    print(f"Rounds: {len(traj.rounds)}")
-    print(f"Final outcome: {traj.final_judgment}")
-```
-
----
-
-## 👥 Authors
-
-### Equal Contribution (*)
-
-- **Yunhao Feng** - Alibaba Group
-- **Yifan Ding** - Alibaba Group
-- **Yifeng Gao** - Fudan University
-
-### Contributors
-
-- **Yingshui Tan** - Alibaba Group
-- **Yige Li** - Fudan University
-- **Yutao Wu** - Fudan University
-- **Kun Zhai** - Fudan University
-- **Yanming Guo** - Hunan Institute of Advanced Technology
-
-### Corresponding Author (†)
-
-- **Xingjun Ma** - Fudan University
 
 ---
 
