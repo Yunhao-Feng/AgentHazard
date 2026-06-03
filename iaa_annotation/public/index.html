@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AgentHazard Annotator</title>
+<style>
+  :root { --bg:#0f1419; --panel:#1a2129; --line:#2c3640; --fg:#e6edf3; --mut:#8b98a5;
+          --user:#1f6feb; --asst:#2ea043; --tool:#bb8009; --res:#6e7681; --bad:#f85149; --ok:#3fb950; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.5 -apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--fg); }
+  #top { display:flex; align-items:center; gap:16px; padding:8px 14px; background:var(--panel);
+         border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; }
+  #top b { font-size:15px; }
+  .pill { padding:2px 8px; border-radius:10px; background:#222b35; color:var(--mut); font-size:12px; }
+  select, button, textarea { font:inherit; }
+  select { background:#222b35; color:var(--fg); border:1px solid var(--line); border-radius:6px; padding:4px 8px; }
+  #wrap { display:flex; height:calc(100vh - 49px); }
+  #side { width:140px; overflow-y:auto; border-right:1px solid var(--line); padding:6px; flex:none; }
+  .dot { display:inline-flex; align-items:center; justify-content:center; width:30px; height:26px; margin:2px;
+         border-radius:5px; background:#222b35; color:var(--mut); cursor:pointer; font-size:12px; border:1px solid transparent; }
+  .dot.done { background:#15331f; color:var(--ok); }
+  .dot.cur  { border-color:var(--user); color:var(--fg); }
+  #main { flex:1; overflow-y:auto; padding:14px 18px; }
+  #meta { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin-bottom:12px; }
+  #meta .row { margin:2px 0; }
+  #meta .k { color:var(--mut); display:inline-block; min-width:96px; }
+  .obj { color:#ffd9a0; }
+  details.decomp summary { cursor:pointer; color:var(--mut); }
+  .ev { border-left:3px solid var(--res); padding:6px 10px; margin:8px 0; background:var(--panel); border-radius:0 6px 6px 0; white-space:pre-wrap; word-break:break-word; }
+  .ev .tag { font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--mut); display:block; margin-bottom:3px; }
+  .ev.user { border-color:var(--user); } .ev.user .tag { color:#7eb6ff; }
+  .ev.assistant { border-color:var(--asst); } .ev.assistant .tag { color:#5fd07e; }
+  .ev.tool_call { border-color:var(--tool); background:#1d1a10; } .ev.tool_call .tag { color:#e0a93a; }
+  .ev.tool_result { border-color:var(--res); background:#161b22; color:var(--mut); }
+  .ev.note { border:none; color:var(--mut); text-align:center; background:none; }
+  .ev pre { margin:0; font:12px/1.45 ui-monospace,Menlo,monospace; white-space:pre-wrap; }
+  #ctrl { position:sticky; bottom:0; background:var(--panel); border-top:1px solid var(--line); padding:10px 18px;
+          display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .seg button { padding:6px 14px; border:1px solid var(--line); background:#222b35; color:var(--fg); cursor:pointer; border-radius:6px; }
+  .seg button.harm.on { background:var(--bad); border-color:var(--bad); color:#fff; }
+  .seg button.safe.on { background:var(--ok); border-color:var(--ok); color:#06210f; }
+  .rate button { width:30px; height:30px; border-radius:6px; border:1px solid var(--line); background:#222b35; color:var(--fg); cursor:pointer; }
+  .rate button.on { background:var(--user); border-color:var(--user); }
+  #note { flex:1; min-width:160px; background:#161b22; color:var(--fg); border:1px solid var(--line); border-radius:6px; padding:5px 8px; }
+  #nav button { padding:6px 12px; border-radius:6px; border:1px solid var(--line); background:#222b35; color:var(--fg); cursor:pointer; }
+  #gemini { background:#26201a; border:1px solid #5a4321; border-radius:8px; padding:8px 12px; margin-bottom:12px; color:#ffd9a0; }
+  .muted { color:var(--mut); }
+</style>
+</head>
+<body>
+<div id="top">
+  <b>AgentHazard 标注</b>
+  <span>标注者
+    <select id="annotator"><option value="a1">Annotator 1</option><option value="a2">Annotator 2</option></select>
+  </span>
+  <span id="mode" class="pill"></span>
+  <button id="nextDiff" style="display:none;padding:3px 10px;border-radius:6px;border:1px solid #f85149;background:#2a1715;color:#f85149;cursor:pointer">下一处分歧 (Gemini≠GPT) →</button>
+  <span id="prog" class="pill"></span>
+  <span class="muted" style="margin-left:auto">快捷键: ←/→ 翻页 · h 有害 · s 无害</span>
+</div>
+<div id="wrap">
+  <div id="side"></div>
+  <div id="main">
+    <div id="gemini" style="display:none"></div>
+    <div id="meta"></div>
+    <div id="events"></div>
+  </div>
+</div>
+<div id="ctrl">
+  <span>有害?</span>
+  <span class="seg">
+    <button id="bHarm" class="harm">有害 (h)</button>
+    <button id="bSafe" class="safe">无害 (s)</button>
+  </span>
+  <input id="note" placeholder="备注（可选）" />
+  <span id="nav">
+    <button id="prev">← 上一条</button>
+    <button id="next">下一条 →</button>
+  </span>
+</div>
+
+<script>
+let SAMPLE=null, REVIEW=false, items=[], idx=0, ann={}, annotator="a1";
+
+async function init(){
+  const s = await (await fetch("/api/sample")).json();
+  SAMPLE=s; REVIEW=s.review; items=s.items;
+  document.getElementById("mode").textContent = REVIEW ? "REVIEW: 显示Gemini" : "BLIND";
+  document.getElementById("mode").style.background = REVIEW ? "#5a4321" : "#222b35";
+  if(REVIEW){
+    const nd=document.getElementById("nextDiff");
+    nd.style.display="inline-block";
+    const ndis=items.filter(judgesSplit).length;
+    nd.textContent=`下一处分歧 (3 judge 不一致: ${ndis}) →`;
+    nd.onclick=nextDisagreement;
+  }
+  await loadAnnotator();
+  bindKeys();
+}
+function judgesSplit(it){
+  if(!it._judges) return false;
+  const vs=Object.values(it._judges).map(j=>j&&typeof j.harmful==="boolean"?j.harmful:null).filter(v=>v!==null);
+  return new Set(vs).size>1;
+}
+function nextDisagreement(){
+  for(let s=1;s<=items.length;s++){
+    const j=(idx+s)%items.length;
+    if(judgesSplit(items[j])){ idx=j; render(); renderSide(); return; }
+  }
+}
+async function loadAnnotator(){
+  annotator=document.getElementById("annotator").value;
+  ann = await (await fetch("/api/annotations/"+annotator)).json();
+  // jump to first unlabeled
+  const firstUn = items.findIndex(it => !(ann[it.item_id] && ann[it.item_id].harmful!==null));
+  idx = firstUn>=0 ? firstUn : 0;
+  renderSide(); render();
+}
+function curAnn(){ const it=items[idx]; return ann[it.item_id] || {harmful:null,note:""}; }
+function renderSide(){
+  const side=document.getElementById("side"); side.innerHTML="";
+  items.forEach((it,i)=>{
+    const a=ann[it.item_id];
+    const d=document.createElement("span");
+    d.className="dot"+((a&&a.harmful!==null)?" done":"")+(i===idx?" cur":"");
+    d.textContent=it.item_id; d.onclick=()=>{idx=i;render();renderSide();};
+    side.appendChild(d);
+  });
+}
+function roleTag(r){ return {user:"用户 / 任务",assistant:"Agent",tool_call:"工具调用",tool_result:"工具输出",note:""}[r]||r; }
+function render(){
+  const it=items[idx];
+  // judge panel (review mode only): show all 3 reference judges, highlight if they disagree
+  const g=document.getElementById("gemini");
+  if(REVIEW && it._judges){ g.style.display="block";
+    const J=it._judges, order=["Gemini-3-Flash","gemini-3.1-pro","gpt-5.4"];
+    const verdicts=order.map(n=>J[n]&&typeof J[n].harmful==="boolean"?J[n].harmful:null).filter(v=>v!==null);
+    const split = new Set(verdicts).size>1;  // judges disagree among themselves
+    g.style.borderColor = split ? "#f85149" : "#3fb950";
+    let html=order.map(n=>{
+      const j=J[n];
+      if(!j||typeof j.harmful!=="boolean") return `<b>${n}</b>: <span class="muted">(无)</span>`;
+      const col=j.harmful?"#f85149":"#3fb950";
+      return `<b>${n}</b> — harmful: <b style="color:${col}">${j.harmful}</b> · s${j.score}`+
+             `<br><span class="muted">${escapeHtml(j.reason||"")}</span>`;
+    }).join('<hr style="border-color:#5a4321;margin:5px 0">');
+    if(split) html=`<b style="color:#f85149">⚠ 三个 judge 判定不一致</b><hr style="border-color:#5a4321;margin:5px 0">`+html;
+    g.innerHTML=html;
+  } else g.style.display="none";
+  // meta
+  const dq=(it.decomposed_query||[]).map((s,i)=>`${i+1}. ${escapeHtml(s)}`).join("\n");
+  document.getElementById("meta").innerHTML=
+    `<div class="row"><span class="k">item</span> ${it.item_id} / ${items.length}</div>`+
+    `<div class="row"><span class="k">framework</span> ${it.framework} &nbsp; <span class="k">model</span> ${it.model}</div>`+
+    `<div class="row"><span class="k">category</span> ${it.category} &nbsp; <span class="k">strategy</span> ${it.jailbreak_method}</div>`+
+    `<div class="row"><span class="k">攻击目标</span> <span class="obj">${escapeHtml(it.attack_objective||"")}</span></div>`+
+    `<div class="row"><span class="k">说明</span> <span class="muted">${escapeHtml(it.attack_comment||"")}</span></div>`+
+    (dq?`<details class="decomp"><summary>分解步骤 (${it.decomposed_query.length})</summary><pre>${dq}</pre></details>`:"");
+  // events
+  const ev=document.getElementById("events"); ev.innerHTML="";
+  it.events.forEach(e=>{
+    const div=document.createElement("div"); div.className="ev "+e.role;
+    if(e.role==="note"){ div.textContent=e.text; ev.appendChild(div); return; }
+    const tag=roleTag(e.role)+(e.name?` · ${escapeHtml(e.name)}`:"");
+    div.innerHTML=`<span class="tag">${tag}</span><pre>${escapeHtml(e.text)}</pre>`;
+    ev.appendChild(div);
+  });
+  document.getElementById("main").scrollTop=0;
+  syncControls(); updateProg();
+}
+function syncControls(){
+  const a=curAnn();
+  document.getElementById("bHarm").classList.toggle("on",a.harmful===true);
+  document.getElementById("bSafe").classList.toggle("on",a.harmful===false);
+  document.getElementById("note").value=a.note||"";
+}
+function updateProg(){
+  const done=items.filter(it=>ann[it.item_id]&&ann[it.item_id].harmful!==null).length;
+  document.getElementById("prog").textContent=`已标 ${done}/${items.length}`;
+}
+async function save(){
+  const it=items[idx], a=curAnn();
+  const body={annotator, item_id:it.item_id, harmful:a.harmful, note:document.getElementById("note").value};
+  ann[it.item_id]={harmful:a.harmful, note:body.note};
+  await fetch("/api/annotate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  renderSide(); updateProg();
+}
+function setHarmful(v){ const it=items[idx]; ann[it.item_id]=Object.assign(curAnn(),{harmful:v}); syncControls(); save(); }
+function go(d){ idx=Math.max(0,Math.min(items.length-1,idx+d)); render(); renderSide(); }
+function escapeHtml(s){ return (s==null?"":String(s)).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+
+document.getElementById("bHarm").onclick=()=>setHarmful(true);
+document.getElementById("bSafe").onclick=()=>setHarmful(false);
+document.getElementById("prev").onclick=()=>go(-1);
+document.getElementById("next").onclick=()=>go(1);
+document.getElementById("note").onchange=save;
+document.getElementById("annotator").onchange=loadAnnotator;
+function bindKeys(){
+  document.addEventListener("keydown",e=>{
+    if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA") return;
+    if(e.key==="ArrowRight") go(1);
+    else if(e.key==="ArrowLeft") go(-1);
+    else if(e.key==="h"||e.key==="H") setHarmful(true);
+    else if(e.key==="s"||e.key==="S") setHarmful(false);
+  });
+}
+init();
+</script>
+</body>
+</html>

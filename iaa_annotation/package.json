@@ -1,0 +1,13 @@
+{
+  "name": "agenthazard-annotator",
+  "version": "1.0.0",
+  "description": "Human validation annotator for the AgentHazard LLM-as-Judge agreement study (rebuttal §B).",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "review": "node server.js --review"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
