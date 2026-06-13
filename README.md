@@ -251,9 +251,11 @@ We welcome contributions! Please see our [contributing guidelines](CONTRIBUTING.
 
 ## 🙏 Acknowledgments
 
-- We thank the Alibaba Group and Fudan University for supporting this research
-- Special thanks to the Claude Code, OpenClaw, and IFlow teams for their agent frameworks
-- We acknowledge the Qwen, Kimi, GLM, and DeepSeek teams for their open models
+
++ Special thanks to **Yutao Wu** and the [Internal Safety Collapse (ISC)](https://github.com/wuyoscar/Internal-Safety-Collapse) project for their generous support and valuable insights. Their work on execution-level safety failures in frontier language models and AI agents provided important inspiration for the development of AgentHazard.
++ We gratefully acknowledge **Alibaba Group** and **Fudan University** for their support of this research.
++ We also thank the **Claude Code**, **OpenClaw**, and **IFlow** teams for their agent frameworks, and the **Qwen**, **Kimi**, **GLM**, and **DeepSeek** teams for their open models and contributions to the research community.
+
 
 ---
 
